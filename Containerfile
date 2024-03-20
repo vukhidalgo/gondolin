@@ -37,7 +37,7 @@ RUN /tmp/install-1password.sh
 RUN rm -rf /var/* && ostree container commit
 
 ## Next: install system Chrome
-FROM tishy-base AS tishy-chrome
+FROM tishy-1password AS tishy-chrome
 
 ## Add system Chrome
 RUN /tmp/install-chrome.sh
