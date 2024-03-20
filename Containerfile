@@ -1,4 +1,4 @@
-FROM ghcr.io/ublue-os/bazzite:latest AS tishtrya-1password
+FROM ghcr.io/ublue-os/bazzite:latest AS tishtrya-base
 
 ARG IMAGE_NAME="${IMAGE_NAME:-tishtrya}"
 ARG IMAGE_VENDOR="${IMAGE_VENDOR:-sunshowers}"
@@ -6,6 +6,26 @@ ARG IMAGE_FLAVOR="${IMAGE_FLAVOR:-main}"
 ARG IMAGE_BRANCH="${IMAGE_BRANCH:-main}"
 ARG BASE_IMAGE_NAME="${BASE_IMAGE_NAME:-bazzite}"
 ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION:-39}"
+
+## Add ryzenadj and infrequently-updated packages
+
+RUN sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_kylegospo-bazzite.repo
+
+RUN rpm-ostree install \
+    direnv \
+    fd-find \
+    libguestfs-tools \
+    perf \
+    powertop \
+    ripgrep \
+    ryzenadj \
+    strace \
+    zsh
+
+## Commit
+RUN rm -rf /var/* && ostree container commit
+
+FROM tishtrya-base AS tishtrya-1password
 
 ## Add 1password
 COPY system_files /
@@ -15,7 +35,7 @@ RUN /tmp/install-1password.sh
 RUN rm -rf /var/* && ostree container commit
 
 ## Next: install system Chrome
-FROM tishtrya-1password AS tishtrya-chrome
+FROM tishtrya-base AS tishtrya-chrome
 
 ## Add system Chrome
 COPY system_files /
@@ -32,31 +52,13 @@ FROM tishtrya-chrome AS tishtrya
 COPY system_files /
 RUN rpm-ostree install \
     chromium \
-    cockpit-bridge \
-    cockpit-kdump \
-    cockpit-machines \
-    cockpit-navigator \
-    cockpit-networkmanager \
-    cockpit-podman \
-    cockpit-selinux \
-    cockpit-storaged \
-    cockpit-system \
     code \
-    direnv \
-    fd-find \
     firefox \
-    libguestfs-tools \
     NetworkManager-tui \
-    perf \
-    powertop \
-    ripgrep \
-    ryzenadj \
-    strace \
     subscription-manager \
     virt-install \
     virt-manager \
-    virt-viewer \
-    zsh
+    virt-viewer
 
 ## Add flatpak packages
 RUN cat /tmp/flatpak_install >> /usr/share/ublue-os/bazzite/flatpak/install
