@@ -39,7 +39,9 @@ RUN rpm-ostree install \
     firefox \
     libguestfs-tools \
     NetworkManager-tui \
+    perf \
     ripgrep \
+    strace \
     subscription-manager \
     virt-install \
     virt-manager \
