@@ -115,8 +115,6 @@ jobs:
         with:
           containerfiles: |
             ./Containerfile
-          # Postfix image name with -custom to make it a little more descriptive
-          # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
           image: ${{ env.MY_IMAGE_NAME }}
           tags: |
             ${{ steps.generate-tags.outputs.alias_tags }}
@@ -124,6 +122,8 @@ jobs:
             SOURCE_IMAGE=${{ env.ARG_SOURCE_IMAGE }}
             FEDORA_VERSION=${{ env.ARG_FEDORA_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
+          # cache intermediate layers to speed up builds
+          layers: true
           oci: false
 
       # Workaround bug where capital letters in your GitHub username make it impossible to push to GHCR.
