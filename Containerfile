@@ -48,6 +48,7 @@ RUN rpm-ostree install \
     libguestfs-tools \
     NetworkManager-tui \
     perf \
+    powertop \
     ripgrep \
     strace \
     subscription-manager \
