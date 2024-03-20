@@ -31,3 +31,12 @@ rm /etc/cron.daily/google-chrome
 
 # Remove the repo file since updates are shipped with new images
 rm /etc/yum.repos.d/google-chrome.repo
+
+## Next, move google-chrome over to /usr/lib
+mv /var/opt/google /usr/lib/google
+
+# Register path symlink
+# We do this via tmpfiles.d so that it is created by the live system.
+cat >/usr/lib/tmpfiles.d/google-chrome.conf <<EOF
+L  /opt/google  -  -  -  -  /usr/lib/google
+EOF
