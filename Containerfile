@@ -7,6 +7,9 @@ ARG IMAGE_BRANCH="${IMAGE_BRANCH:-main}"
 ARG BASE_IMAGE_NAME="${BASE_IMAGE_NAME:-bazzite}"
 ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION:-39}"
 
+## Copy system files over
+COPY system_files /
+
 ## Add ryzenadj and infrequently-updated packages
 
 RUN sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_kylegospo-bazzite.repo
@@ -28,7 +31,6 @@ RUN rm -rf /var/* && ostree container commit
 FROM tishy-base AS tishy-1password
 
 ## Add 1password
-COPY system_files /
 RUN /tmp/install-1password.sh
 
 ## Commit
@@ -38,7 +40,6 @@ RUN rm -rf /var/* && ostree container commit
 FROM tishy-base AS tishy-chrome
 
 ## Add system Chrome
-COPY system_files /
 RUN /tmp/install-chrome.sh
 
 ## Commit
@@ -49,13 +50,11 @@ RUN rm -rf /var/* && ostree container commit
 FROM tishy-chrome AS tishy
 
 ## Install other new packages
-COPY system_files /
 RUN rpm-ostree install \
     chromium \
     code \
     firefox \
     NetworkManager-tui \
-    subscription-manager \
     virt-install \
     virt-manager \
     virt-viewer
