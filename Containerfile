@@ -1,6 +1,6 @@
-FROM ghcr.io/ublue-os/bazzite:latest AS tishtrya-base
+FROM ghcr.io/ublue-os/bazzite:latest AS tishy-base
 
-ARG IMAGE_NAME="${IMAGE_NAME:-tishtrya}"
+ARG IMAGE_NAME="${IMAGE_NAME:-tishy}"
 ARG IMAGE_VENDOR="${IMAGE_VENDOR:-sunshowers}"
 ARG IMAGE_FLAVOR="${IMAGE_FLAVOR:-main}"
 ARG IMAGE_BRANCH="${IMAGE_BRANCH:-main}"
@@ -25,7 +25,7 @@ RUN rpm-ostree install \
 ## Commit
 RUN rm -rf /var/* && ostree container commit
 
-FROM tishtrya-base AS tishtrya-1password
+FROM tishy-base AS tishy-1password
 
 ## Add 1password
 COPY system_files /
@@ -35,7 +35,7 @@ RUN /tmp/install-1password.sh
 RUN rm -rf /var/* && ostree container commit
 
 ## Next: install system Chrome
-FROM tishtrya-base AS tishtrya-chrome
+FROM tishy-base AS tishy-chrome
 
 ## Add system Chrome
 COPY system_files /
@@ -46,7 +46,7 @@ RUN rm -rf /var/* && ostree container commit
 
 ## Lastly: install other packages
 
-FROM tishtrya-chrome AS tishtrya
+FROM tishy-chrome AS tishy
 
 ## Install other new packages
 COPY system_files /

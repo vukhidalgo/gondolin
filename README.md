@@ -1,4 +1,4 @@
-# Tishtrya
+# tishy
 
 Personal atomic Linux desktop attempt, based on Bazzite.
 
