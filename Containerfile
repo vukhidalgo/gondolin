@@ -31,6 +31,7 @@ RUN rm -rf /var/* && ostree container commit
 FROM tishy-base AS tishy-1password
 
 ## Add 1password
+COPY system_files /
 RUN /tmp/install-1password.sh
 
 ## Commit
@@ -40,6 +41,7 @@ RUN rm -rf /var/* && ostree container commit
 FROM tishy-1password AS tishy-chrome
 
 ## Add system Chrome
+COPY system_files /
 RUN /tmp/install-chrome.sh
 
 ## Commit
