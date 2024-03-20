@@ -6,7 +6,7 @@ set -ouex pipefail
 
 echo "Installing Google Chrome"
 
-mpdir -p /var/opt
+mkdir -p /var/opt
 
 cat << EOF > /etc/yum.repos.d/google-chrome.repo
 [google-chrome]
