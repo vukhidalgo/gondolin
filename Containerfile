@@ -29,6 +29,7 @@ RUN rpm-ostree install \
     code \
     direnv \
     fd-find \
+    firefox \
     libguestfs-tools \
     NetworkManager-tui \
     ripgrep \
