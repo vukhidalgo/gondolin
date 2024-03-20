@@ -15,8 +15,15 @@ COPY system_files /
 ### 4. MODIFICATIONS
 ## make modifications desired in your image and install packages here, a few examples follow
 
-## Install new packages
+## Add 1password
+RUN /tmp/install-1password.sh
+
+## Add system Chrome
+RUN /tmp/install-chrome.sh
+
+## Install other new packages
 RUN rpm-ostree install \
+    chromium \
     cockpit-bridge \
     cockpit-kdump \
     cockpit-machines \
@@ -41,9 +48,6 @@ RUN rpm-ostree install \
 
 ## Add flatpak packages
 RUN cat /tmp/flatpak_install >> /usr/share/ublue-os/bazzite/flatpak/install
-
-## Add 1password
-RUN /tmp/install-1password.sh
 
 ## Configure KDE & GNOME
 RUN sed -i '/<entry name="launchers" type="StringList">/,/<\/entry>/ s/<default>[^<]*<\/default>/<default>applications:org.gnome.Prompt.desktop,preferred:\/\/browser,preferred:\/\/filemanager,applications:code.desktop,applications:steam.desktop<\/default>/' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml && \
