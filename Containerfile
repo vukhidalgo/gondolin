@@ -50,6 +50,7 @@ RUN rpm-ostree install \
     perf \
     powertop \
     ripgrep \
+    ryzenadj \
     strace \
     subscription-manager \
     virt-install \
