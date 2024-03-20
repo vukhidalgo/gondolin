@@ -1,4 +1,4 @@
-FROM ghcr.io/ublue-os/bazzite:latest AS tishtrya
+FROM ghcr.io/ublue-os/bazzite:latest AS tishtrya-1password
 
 ARG IMAGE_NAME="${IMAGE_NAME:-tishtrya}"
 ARG IMAGE_VENDOR="${IMAGE_VENDOR:-sunshowers}"
@@ -7,21 +7,29 @@ ARG IMAGE_BRANCH="${IMAGE_BRANCH:-main}"
 ARG BASE_IMAGE_NAME="${BASE_IMAGE_NAME:-bazzite}"
 ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION:-39}"
 
-### 3. PRE-MODIFICATIONS
-
-## Copy System files to be used in image
-COPY system_files /
-
-### 4. MODIFICATIONS
-## make modifications desired in your image and install packages here, a few examples follow
-
 ## Add 1password
+COPY system_files /
 RUN /tmp/install-1password.sh
 
+## Commit
+RUN rm -rf /var/* && ostree container commit
+
+## Next: install system Chrome
+FROM tishtrya-1password AS tishtrya-chrome
+
 ## Add system Chrome
+COPY system_files /
 RUN /tmp/install-chrome.sh
 
+## Commit
+RUN rm -rf /var/* && ostree container commit
+
+## Lastly: install other packages
+
+FROM tishtrya-chrome AS tishtrya
+
 ## Install other new packages
+COPY system_files /
 RUN rpm-ostree install \
     chromium \
     cockpit-bridge \
@@ -59,7 +67,5 @@ RUN sed -i '/<entry name="launchers" type="StringList">/,/<\/entry>/ s/<default>
 ## these commands leave the image in a clean state after local modifications
 # Cleanup & Finalize
 RUN \
-    rm -rf \
-    /tmp/* \
-    /var/* && \
+    rm -rf /tmp/* /var/* && \
     ostree container commit
