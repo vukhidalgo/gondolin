@@ -16,6 +16,7 @@ RUN sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_kylegospo-bazzite.re
 
 RUN rpm-ostree install \
     direnv \
+    evtest \
     fd-find \
     libguestfs-tools \
     perf \
