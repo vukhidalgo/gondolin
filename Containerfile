@@ -24,6 +24,7 @@ RUN rpm-ostree install \
     ripgrep \
     ryzenadj \
     strace \
+    yakuake \
     zsh
 
 ## Add flatpak packages
