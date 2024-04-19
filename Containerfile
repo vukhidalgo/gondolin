@@ -18,6 +18,7 @@ RUN rpm-ostree install \
     direnv \
     evtest \
     fd-find \
+    kontact \
     libguestfs-tools \
     perf \
     powertop \
