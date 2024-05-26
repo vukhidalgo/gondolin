@@ -65,7 +65,8 @@ RUN rpm-ostree install \
     NetworkManager-tui \
     virt-install \
     virt-manager \
-    virt-viewer
+    virt-viewer \
+    https://github.com/wez/wezterm/releases/download/nightly/wezterm-nightly-fedora${FEDORA_MAJOR_VERSION}.rpm
 
 ## Configure KDE & GNOME
 RUN sed -i '/<entry name="launchers" type="StringList">/,/<\/entry>/ s/<default>[^<]*<\/default>/<default>applications:org.gnome.Prompt.desktop,preferred:\/\/browser,preferred:\/\/filemanager,applications:code.desktop,applications:steam.desktop<\/default>/' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml && \
