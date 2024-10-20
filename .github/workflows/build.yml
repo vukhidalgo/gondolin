@@ -172,7 +172,7 @@ jobs:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
 
   push-ghcr-nvidia:
-    name: Build and push image
+    name: Build and push Nvidia image
     runs-on: ubuntu-24.04
     # The env variables starting with "ARG_" are described in the Containerfile of this repo.
     # The values here are defaults and should be modified if using a different image, needing
