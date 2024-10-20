@@ -1,6 +1,8 @@
-FROM ghcr.io/ublue-os/bazzite:latest AS tishy-base
+ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION:-40}"
 
-ARG IMAGE_NAME="${IMAGE_NAME:-tishy}"
+FROM ghcr.io/ublue-os/bazzite-nvidia-open:latest AS tishy-nvidia-base
+
+ARG IMAGE_NAME="${IMAGE_NAME:-tishy-nvidia}"
 ARG IMAGE_VENDOR="${IMAGE_VENDOR:-sunshowers}"
 ARG IMAGE_FLAVOR="${IMAGE_FLAVOR:-main}"
 ARG IMAGE_BRANCH="${IMAGE_BRANCH:-main}"
@@ -10,7 +12,7 @@ ARG FEDORA_MAJOR_VERSION
 ## Copy system files over
 COPY system_files /
 
-## Add ryzenadj and infrequently-updated packages
+## Add infrequently-updated packages
 
 RUN sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_kylegospo-bazzite.repo
 
@@ -23,7 +25,6 @@ RUN rpm-ostree install \
     perf \
     powertop \
     ripgrep \
-    ryzenadj \
     strace \
     yakuake \
     zsh
@@ -34,7 +35,7 @@ RUN cat /tmp/flatpak_install >> /usr/share/ublue-os/bazzite/flatpak/install
 ## Commit
 RUN rm -rf /var/* && ostree container commit
 
-FROM tishy-base AS tishy-1password
+FROM tishy-nvidia-base AS tishy-nvidia-1password
 
 ## Add 1password
 COPY system_files /
@@ -44,7 +45,7 @@ RUN /tmp/install-1password.sh
 RUN rm -rf /var/* && ostree container commit
 
 ## Next: install system Chrome
-FROM tishy-1password AS tishy-chrome
+FROM tishy-nvidia-1password AS tishy-nvidia-chrome
 
 ## Add system Chrome
 COPY system_files /
@@ -55,7 +56,7 @@ RUN rm -rf /var/* && ostree container commit
 
 ## Lastly: install other packages
 
-FROM tishy-chrome AS tishy
+FROM tishy-nvidia-chrome AS tishy-nvidia
 ARG FEDORA_MAJOR_VERSION
 
 ## Install other new packages
@@ -79,5 +80,3 @@ RUN sed -i '/<entry name="launchers" type="StringList">/,/<\/entry>/ s/<default>
 RUN \
     rm -rf /tmp/* /var/* && \
     ostree container commit
-
-
