@@ -14,6 +14,10 @@ on:
       - "**.txt"
   workflow_dispatch:
 
+env:
+  ARG_SOURCE_IMAGE: "bazzite" # see Containerfile for list of possible upstream images
+  ARG_FEDORA_VERSION: "41" # see Containerfile
+  IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}" # do not edit
 
 jobs:
   push-ghcr:
@@ -24,9 +28,6 @@ jobs:
     # nvidia, a specific nvidia driver, or a different Fedora version.
     env:
       MY_IMAGE_NAME: "tishy" # the name of the image produced by this build
-      ARG_SOURCE_IMAGE: "bazzite" # see Containerfile for list of possible upstream images
-      ARG_FEDORA_VERSION: "40" # see Containerfile
-      IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}" # do not edit
 
     permissions:
       contents: read
@@ -179,9 +180,6 @@ jobs:
     # nvidia, a specific nvidia driver, or a different Fedora version.
     env:
       MY_IMAGE_NAME: "tishy-nvidia" # the name of the image produced by this build
-      ARG_SOURCE_IMAGE: "bazzite" # see Containerfile for list of possible upstream images
-      ARG_FEDORA_VERSION: "40" # see Containerfile
-      IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}" # do not edit
 
     permissions:
       contents: read
