@@ -17,6 +17,7 @@ COPY system_files /
 RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
     sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_kylegospo-bazzite.repo && \
     rpm-ostree install \
+        corectrl \
         direnv \
         evtest \
         fd-find \
