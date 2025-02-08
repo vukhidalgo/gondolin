@@ -12,16 +12,22 @@ ARG FEDORA_MAJOR_VERSION
 ## Copy system files over
 COPY system_files /
 
-## Add infrequently-updated packages
+## Add base packages
 
 RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
-    sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_kylegospo-bazzite.repo && \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
+    dnf5 -y copr enable -y kylegospo/bazzite && \
     rpm-ostree install \
+        chromium \
+        code \
+        corectrl \
         direnv \
         evtest \
         fd-find \
+        firefox \
         kontact \
         libguestfs-tools \
+        NetworkManager-tui \
         perf \
         powertop \
         ripgrep \
@@ -29,41 +35,23 @@ RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
         yakuake \
         zsh && \
     cat /tmp/flatpak_install >> /usr/share/ublue-os/bazzite/flatpak/install && \
-    /tmp/cleanup.sh && \
-    ostree container commit
-
-FROM tishy-nvidia-base AS tishy-nvidia-1password
-
-## Add 1password
-COPY system_files /
-RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
     /tmp/install-1password.sh && \
-    /tmp/cleanup.sh && \
-    ostree container commit
-
-## Next: install system Chrome
-FROM tishy-nvidia-1password AS tishy-nvidia-chrome
-
-## Add system Chrome
-COPY system_files /
-RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
     /tmp/install-chrome.sh && \
     /tmp/cleanup.sh && \
     ostree container commit
 
-## Lastly: install other packages
+## Install other packages
+## XXX: probably should combine everything into one layer
 
-FROM tishy-nvidia-chrome AS tishy-nvidia
+FROM tishy-nvidia-base AS tishy
 ARG FEDORA_MAJOR_VERSION
 
 ## Install other new packages
 COPY system_files /
 RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
     curl -Lo /etc/yum.repos.d/_copr_wezfurlong-wezterm-nightly.repo https://copr.fedorainfracloud.org/coprs/wezfurlong/wezterm-nightly/repo/fedora-"${FEDORA_MAJOR_VERSION}"/wezfurlong-wezterm-nightly-"${FEDORA_MAJOR_VERSION}".repo && \
     rpm-ostree install \
-        chromium \
-        code \
-        firefox \
         NetworkManager-tui \
         virt-install \
         virt-manager \
@@ -71,5 +59,6 @@ RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
         wezterm && \
     sed -i '/<entry name="launchers" type="StringList">/,/<\/entry>/ s/<default>[^<]*<\/default>/<default>applications:org.gnome.Prompt.desktop,preferred:\/\/browser,preferred:\/\/filemanager,applications:code.desktop,applications:steam.desktop<\/default>/' /usr/share/plasma/plasmoids/org.kde.plasma.taskmanager/contents/config/main.xml && \
     sed -i '/<entry name="favorites" type="StringList">/,/<\/entry>/ s/<default>[^<]*<\/default>/<default>org.gnome.Prompt.desktop,preferred:\/\/browser,org.kde.dolphin.desktop,code.desktop,steam.desktop<\/default>/' /usr/share/plasma/plasmoids/org.kde.plasma.kickoff/contents/config/main.xml && \
+    KERNEL_FLAVOR=bazzite /usr/libexec/containerbuild/build-initramfs && \
     /tmp/cleanup.sh && \
     ostree container commit

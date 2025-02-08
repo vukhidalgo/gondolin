@@ -12,17 +12,22 @@ ARG FEDORA_MAJOR_VERSION
 ## Copy system files over
 COPY system_files /
 
-## Add infrequently-updated packages
+## Add base packages
 
 RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
-    sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_kylegospo-bazzite.repo && \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
+    dnf5 -y copr enable -y kylegospo/bazzite && \
     rpm-ostree install \
+        chromium \
+        code \
         corectrl \
         direnv \
         evtest \
         fd-find \
+        firefox \
         kontact \
         libguestfs-tools \
+        NetworkManager-tui \
         perf \
         powertop \
         ripgrep \
@@ -30,41 +35,23 @@ RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
         yakuake \
         zsh && \
     cat /tmp/flatpak_install >> /usr/share/ublue-os/bazzite/flatpak/install && \
-    /tmp/cleanup.sh && \
-    ostree container commit
-
-FROM tishy-base AS tishy-1password
-
-## Add 1password
-COPY system_files /
-RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
     /tmp/install-1password.sh && \
-    /tmp/cleanup.sh && \
-    ostree container commit
-
-## Next: install system Chrome
-FROM tishy-1password AS tishy-chrome
-
-## Add system Chrome
-COPY system_files /
-RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
     /tmp/install-chrome.sh && \
     /tmp/cleanup.sh && \
     ostree container commit
 
-## Lastly: install other packages
+## Install other packages
+## XXX: probably should combine everything into one layer
 
-FROM tishy-chrome AS tishy
+FROM tishy-base AS tishy
 ARG FEDORA_MAJOR_VERSION
 
 ## Install other new packages
 COPY system_files /
 RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
+    --mount=type=cache,dst=/var/cache/libdnf5 \
     curl -Lo /etc/yum.repos.d/_copr_wezfurlong-wezterm-nightly.repo https://copr.fedorainfracloud.org/coprs/wezfurlong/wezterm-nightly/repo/fedora-"${FEDORA_MAJOR_VERSION}"/wezfurlong-wezterm-nightly-"${FEDORA_MAJOR_VERSION}".repo && \
     rpm-ostree install \
-        chromium \
-        code \
-        firefox \
         NetworkManager-tui \
         virt-install \
         virt-manager \
